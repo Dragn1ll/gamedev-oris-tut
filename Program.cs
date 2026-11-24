@@ -83,7 +83,13 @@ static Task HandleRequestAsync(HttpListenerContext context)
                 break;
             case ("GET", "/tasks"):
                 string filePath = Path.Combine(AppContext.BaseDirectory, "tasks.html");
-                string html = await File.ReadAllTextAsync(filePath, Encoding.UTF8);
+                string template = await File.ReadAllTextAsync(filePath, Encoding.UTF8);
+                var model = new TasksPage("Список задач",
+                [
+                    new("Прочитать про HTTP-запросы", true),
+                    new("Проверить маршруты через curl", false)
+                ]);
+                string html = HtmlTemplate.Render(template, model);
                 await SendAsync(200, "text/html", html);
                 break;
             default:
@@ -118,3 +124,13 @@ static string ErrorPage(int status, string message) =>
     </body>
     </html>
     """;
+
+sealed record TasksPage(string Title, IReadOnlyList<TaskItem> Tasks)
+{
+    public bool IsEmpty => Tasks.Count == 0;
+}
+
+sealed record TaskItem(string Title, bool IsCompleted)
+{
+    public bool IsPending => !IsCompleted;
+}

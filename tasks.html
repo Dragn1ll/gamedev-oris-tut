@@ -2,13 +2,17 @@
 <html lang="ru">
 <head>
     <meta charset="utf-8">
-    <title>Список задач</title>
+    <title>@Model.Title</title>
 </head>
 <body>
-    <h1>Список задач</h1>
+    <h1>@Model.Title</h1>
+    @if (Model.IsEmpty) {
+        <p>Задач пока нет</p>
+    }
     <ul>
-        <li>Прочитать про HTTP-запросы</li>
-        <li>Проверить маршруты через curl</li>
+        @foreach (var task in Model.Tasks) {
+            <li>@if (task.IsCompleted) {<s>@task.Title</s>}@if (task.IsPending) {@task.Title}</li>
+        }
     </ul>
 </body>
 </html>
